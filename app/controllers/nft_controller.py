@@ -1,5 +1,6 @@
 from app.models.nft_model import NFTModel
 from app.dto.nft_dto import NFTCollectionDTO, NFTPreviewDTO
+from fastapi import HTTPException
 
 
 class NFTController:
@@ -23,4 +24,4 @@ class NFTController:
             )
             return collection_dto
         else:
-            return {"error": "Collection not found"}
+            raise HTTPException(status_code=404, detail="Collection not found")
