@@ -16,7 +16,7 @@ class NFTController:
             ]
 
             collection_dto = NFTCollectionDTO(
-                # collection_name=collection_data["metadata"],
+                metadata=collection_data["metadata"],
                 collection_address=collection_data["address"],
                 owner_address=collection_data["owner"],
                 items_count=collection_data["next_item_index"],
