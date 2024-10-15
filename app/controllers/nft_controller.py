@@ -1,10 +1,10 @@
 from app.models.nft_model import NFTModel
-from app.dto.nft_dto import (
-    NFTCollectionDTO,
-    NFTPreviewDTO,
-    NFTItemsDto,
-    NFTItemDTO,
-    NFTItemMetadataDto,
+from app.schemas.nft import (
+    NFTCollectionSchema,
+    NFTPreviewSchema,
+    NFTItemsSchema,
+    NFTItemSchema,
+    NFTItemMetadataSchema,
 )
 from fastapi import HTTPException
 
@@ -17,18 +17,18 @@ class NFTController:
 
         if collection_data:
             previews = [
-                NFTPreviewDTO(resolution=p["resolution"], url=p["url"])
+                NFTPreviewSchema(resolution=p["resolution"], url=p["url"])
                 for p in collection_data["previews"]
             ]
 
-            collection_dto = NFTCollectionDTO(
+            collection_Schema = NFTCollectionSchema(
                 metadata=collection_data["metadata"],
                 collection_address=collection_data["address"],
                 owner_address=collection_data["owner"],
                 items_count=collection_data["next_item_index"],
                 previews=previews,
             )
-            return collection_dto
+            return collection_Schema
         else:
             raise HTTPException(status_code=404, detail="Collection not found")
 
@@ -40,27 +40,29 @@ class NFTController:
         if items:
             print(items, "\n\n\n")
             try:
-                items_dto = NFTItemsDto(
+                items_Schema = NFTItemsSchema(
                     nft_items=[
-                        NFTItemDTO(
+                        NFTItemSchema(
                             address=item["address"],
                             index=item["index"],
                             owner_address=item["owner_address"],
-                            metadata=NFTItemMetadataDto(
+                            metadata=NFTItemMetadataSchema(
                                 name=item["metadata"].get("name", ""),
                                 description=item["metadata"].get("description", ""),
                                 marketplace=item["metadata"].get("marketplace", ""),
                                 image=item["metadata"].get("image"),
                             ),
                             previews=[
-                                NFTPreviewDTO(resolution=p["resolution"], url=p["url"])
+                                NFTPreviewSchema(
+                                    resolution=p["resolution"], url=p["url"]
+                                )
                                 for p in item.get("previews", [])
                             ],
                         )
                         for item in items["nft_items"]
                     ],
                 )
-                return items_dto
+                return items_Schema
             except Exception as e:
                 print(e)
 

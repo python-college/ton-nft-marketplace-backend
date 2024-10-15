@@ -2,12 +2,12 @@ from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
 
 
-class NFTPreviewDTO(BaseModel):
+class NFTPreviewSchema(BaseModel):
     resolution: str
     url: HttpUrl
 
 
-class NFTCollectionMetadataDTO(BaseModel):
+class NFTCollectionMetadataSchema(BaseModel):
     cover_image: HttpUrl = None
     description: str = ""
     marketplace: str = ""
@@ -17,29 +17,29 @@ class NFTCollectionMetadataDTO(BaseModel):
     image: HttpUrl = None
 
 
-class NFTCollectionDTO(BaseModel):
-    metadata: NFTCollectionMetadataDTO
+class NFTCollectionSchema(BaseModel):
+    metadata: NFTCollectionMetadataSchema
     collection_address: str
     owner_address: str
     items_count: int
-    previews: List[NFTPreviewDTO]
+    previews: List[NFTPreviewSchema]
 
 
-class NFTItemMetadataDto(BaseModel):
+class NFTItemMetadataSchema(BaseModel):
     description: str = ""
     marketplace: str = ""
     name: str = ""
     image: HttpUrl = None
 
 
-class NFTItemDTO(BaseModel):
+class NFTItemSchema(BaseModel):
     address: str
     index: int
     owner_address: str
-    collection: NFTCollectionDTO = None
-    metadata: NFTItemMetadataDto
-    previews: List[NFTPreviewDTO]
+    collection: NFTCollectionSchema = None
+    metadata: NFTItemMetadataSchema
+    previews: List[NFTPreviewSchema]
 
 
-class NFTItemsDto(BaseModel):
-    nft_items: List[NFTItemDTO] = []
+class NFTItemsSchema(BaseModel):
+    nft_items: List[NFTItemSchema] = []
