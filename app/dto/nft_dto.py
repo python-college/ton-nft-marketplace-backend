@@ -7,7 +7,7 @@ class NFTPreviewDTO(BaseModel):
     url: HttpUrl
 
 
-class NFTMetadataDTO(BaseModel):
+class NFTCollectionMetadataDTO(BaseModel):
     cover_image: HttpUrl = None
     description: str = ""
     marketplace: str = ""
@@ -18,8 +18,28 @@ class NFTMetadataDTO(BaseModel):
 
 
 class NFTCollectionDTO(BaseModel):
-    metadata: NFTMetadataDTO
+    metadata: NFTCollectionMetadataDTO
     collection_address: str
     owner_address: str
     items_count: int
     previews: List[NFTPreviewDTO]
+
+
+class NFTItemMetadataDto(BaseModel):
+    description: str = ""
+    marketplace: str = ""
+    name: str = ""
+    image: HttpUrl = None
+
+
+class NFTItemDTO(BaseModel):
+    address: str
+    index: int
+    owner_address: str
+    collection: NFTCollectionDTO = None
+    metadata: NFTItemMetadataDto
+    previews: List[NFTPreviewDTO]
+
+
+class NFTItemsDto(BaseModel):
+    nft_items: List[NFTItemDTO] = []
