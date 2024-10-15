@@ -1,3 +1,4 @@
+from fastapi import HTTPException
 from app.models.nft_model import NFTModel
 from app.schemas.nft import (
     NFTCollectionSchema,
@@ -6,7 +7,6 @@ from app.schemas.nft import (
     NFTItemSchema,
     NFTItemMetadataSchema,
 )
-from fastapi import HTTPException
 
 
 class NFTController:
@@ -21,14 +21,14 @@ class NFTController:
                 for p in collection_data["previews"]
             ]
 
-            collection_Schema = NFTCollectionSchema(
+            collection_schema = NFTCollectionSchema(
                 metadata=collection_data["metadata"],
                 collection_address=collection_data["address"],
-                owner_address=collection_data["owner"],
+                owner_address=collection_data["owner_address"],
                 items_count=collection_data["next_item_index"],
                 previews=previews,
             )
-            return collection_Schema
+            return collection_schema
         else:
             raise HTTPException(status_code=404, detail="Collection not found")
 
@@ -38,7 +38,6 @@ class NFTController:
         items = await nft_model.fetch_items_by_collection(collection_address)
 
         if items:
-            print(items, "\n\n\n")
             try:
                 items_Schema = NFTItemsSchema(
                     nft_items=[
@@ -68,3 +67,25 @@ class NFTController:
 
         else:
             raise HTTPException(status_code=404, detail="Collection not found")
+
+    @staticmethod
+    async def get_item_by_address(nft_address: str):
+        nft_model = NFTModel()
+        item_data = await nft_model.fetch_item_data(nft_address)
+
+        if item_data:
+            previews = [
+                NFTPreviewSchema(resolution=p["resolution"], url=p["url"])
+                for p in item_data["previews"]
+            ]
+
+            collection_schema = NFTItemSchema(
+                metadata=item_data["metadata"],
+                address=item_data["address"],
+                owner_address=item_data["owner_address"],
+                index=item_data["index"],
+                previews=previews,
+            )
+            return collection_schema
+        else:
+            raise HTTPException(status_code=404, detail="Item not found")
