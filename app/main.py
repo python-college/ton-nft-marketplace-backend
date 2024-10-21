@@ -1,12 +1,13 @@
 from fastapi import FastAPI
-from app.routes import nft_routes
+from app.routes import nft_routes, auth_routes
 
 
 app = FastAPI()
 
 app.include_router(nft_routes.router)
+app.include_router(auth_routes.router)
 
-# Точка входа для запуска сервера
+
 if __name__ == "__main__":
     import uvicorn
 
