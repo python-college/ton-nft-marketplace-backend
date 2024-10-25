@@ -1,8 +1,13 @@
 from pytonconnect.storage import IStorage
 import redis.asyncio as redis
-from app.settings import REDIS_HOST, REDIS_PORT
+from app.settings import REDIS_HOST, REDIS_PORT, REDIS_PASSWORD, REDIS_USER, REDIS_USER_PASSWORD
 
-client = redis.Redis(host=REDIS_HOST, port=REDIS_PORT)
+client = redis.Redis(
+    host=REDIS_HOST,
+    port=REDIS_PORT,
+    username=REDIS_USER,
+    password=REDIS_USER_PASSWORD
+)
 
 
 class Storage(IStorage):
