@@ -1,5 +1,5 @@
-from pydantic import BaseModel, HttpUrl
 from typing import List, Optional
+from pydantic import BaseModel, HttpUrl
 
 
 class NFTPreviewSchema(BaseModel):
@@ -8,13 +8,13 @@ class NFTPreviewSchema(BaseModel):
 
 
 class NFTCollectionMetadataSchema(BaseModel):
-    cover_image: HttpUrl = None
+    cover_image: Optional[HttpUrl] = None
     description: str = ""
     marketplace: str = ""
-    external_url: HttpUrl = None
+    external_url: Optional[HttpUrl] = None
     social_links: List[HttpUrl] = []
     name: str = ""
-    image: HttpUrl = None
+    image: Optional[HttpUrl] = None
 
 
 class NFTCollectionSchema(BaseModel):
@@ -29,14 +29,14 @@ class NFTItemMetadataSchema(BaseModel):
     description: str = ""
     marketplace: str = ""
     name: str = ""
-    image: HttpUrl = None
+    image: Optional[HttpUrl] = None
 
 
 class NFTItemSchema(BaseModel):
     address: str
     index: int
     owner_address: str
-    collection: NFTCollectionSchema = None
+    collection: Optional[NFTCollectionSchema] = None
     metadata: NFTItemMetadataSchema
     previews: List[NFTPreviewSchema]
 
