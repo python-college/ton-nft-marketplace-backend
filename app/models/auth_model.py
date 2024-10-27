@@ -3,22 +3,22 @@ from app.utils.auth_utils import get_connector
 
 
 class AuthModel:
-    def __init__(self, token):
-        self.token = token
+    def __init__(self, session_id: str):
+        self.session_id = session_id
+        self.connector = get_connector(session_id)
 
-    async def connect_wallet(self):
-        connector = get_connector(self.token)
-        wallets_list = connector.get_wallets()
+    async def connect_wallet(self) -> str:
+        wallets_list = self.connector.get_wallets()
         wallet = wallets_list[0]
-        generated_url = await connector.connect(wallet)
+        generated_url = await self.connector.connect(wallet)
         return generated_url
 
-    async def check_auth_token(self):
-        connector = get_connector(self.token)
-        await connector.restore_connection()
+    async def handle_auth(self):
 
-        if connector.connected and connector.account.address:
-            address = Address(connector.account.address).to_string(
+        await self.connector.restore_connection()
+        await self.connector.wait_for_connection()
+        if self.connector.connected and self.connector.account.address:
+            address = Address(self.connector.account.address).to_string(
                 is_bounceable=True, is_user_friendly=True
             )
             return address

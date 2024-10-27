@@ -1,23 +1,27 @@
-from fastapi import HTTPException
-from app.utils.auth_utils import generate_auth_token
+from fastapi import WebSocket
+from app.utils.auth_utils import generate_session_id
 from app.models.auth_model import AuthModel
-from app.schemas.auth import AuthResponceSchema, CheckAuthSchema
+from app.schemas.auth import AuthLinkSchema, AuthCredentialsSchema
 
 
 class AuthController:
+
     @staticmethod
-    async def get_auth_token():
-        token = generate_auth_token()
-        auth = AuthModel(token)
+    async def auth_websocket(websocket: WebSocket):
+        await websocket.accept()
+
+        session_id = generate_session_id()
+        auth = AuthModel(session_id)
+
         auth_link = await auth.connect_wallet()
+        await websocket.send_json(AuthLinkSchema(auth_link=auth_link).model_dump())
 
-        responce = AuthResponceSchema(auth_link=auth_link, token=token)
-        return responce
-
-    @staticmethod
-    async def check_auth_token(token):
-        auth = AuthModel(token)
-        address = await auth.check_auth_token()
+        address = await auth.handle_auth()
         if address:
-            return CheckAuthSchema(address=address)
-        raise HTTPException(status_code=403, detail="Unauthorized")
+            await websocket.send_json(
+                AuthCredentialsSchema(
+                    address=address, session_id=session_id
+                ).model_dump()
+            )
+
+        await websocket.close()
