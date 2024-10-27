@@ -1,15 +1,12 @@
-import secrets
-import string
+import uuid
 from pytonconnect import TonConnect
-from app.settings import AUTH_TOKEN_LENGTH, MANIFEST_URL
-from app.db.storage import Storage
+from app.settings import MANIFEST_URL
+from app.db.tonconnect import TonConnectStorage
 
 
-def generate_auth_token():
-    characters = string.ascii_letters + string.digits
-    token = "".join(secrets.choice(characters) for _ in range(AUTH_TOKEN_LENGTH))
-    return token
+def get_connector(session_id: str) -> TonConnect:
+    return TonConnect(MANIFEST_URL, storage=TonConnectStorage(session_id))
 
 
-def get_connector(token: string):
-    return TonConnect(MANIFEST_URL, storage=Storage(token))
+def generate_session_id() -> str:
+    return str(uuid.uuid4())

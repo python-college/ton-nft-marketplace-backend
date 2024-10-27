@@ -1,10 +1,10 @@
 from pydantic import BaseModel
 
 
-class AuthResponceSchema(BaseModel):
-    token: str
+class AuthLinkSchema(BaseModel):
     auth_link: str
 
 
-class CheckAuthSchema(BaseModel):
+class AuthCredentialsSchema(BaseModel):
     address: str
+    session_id: str
