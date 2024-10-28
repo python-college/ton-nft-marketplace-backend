@@ -57,3 +57,7 @@ services:
 
 volumes:
   redis-data:
+
+networks:
+  backend_to_redis:
+    driver: bridge
