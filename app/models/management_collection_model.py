@@ -5,7 +5,7 @@ from tonutils.nft import CollectionStandardModified
 from tonutils.nft.content import CollectionModifiedOnchainContent
 from tonutils.nft.royalty_params import RoyaltyParams
 from app.utils.auth_utils import get_connector
-from app.schemas.management import MintCollectionSchema
+from app.schemas.collection_management import MintCollectionSchema
 
 
 class ManagementCollectionModel:

@@ -2,7 +2,7 @@ import json
 from fastapi import WebSocket
 from pydantic import ValidationError
 from pytonconnect.exceptions import UserRejectsError
-from app.schemas.management import (
+from app.schemas.collection_management import (
     MintCollectionSchema,
     MintCollectionUserRejectsSchema,
     MintCollectionDataProcessedSchema,
