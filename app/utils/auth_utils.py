@@ -1,7 +1,7 @@
 import uuid
 from pytonconnect import TonConnect
 from app.settings import MANIFEST_URL
-from app.db.tonconnect import TonConnectStorage
+from app.services.tonconnect_storage import TonConnectStorage
 
 
 def get_connector(session_id: str) -> TonConnect:
