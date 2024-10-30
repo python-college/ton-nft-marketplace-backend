@@ -9,7 +9,7 @@ class AuthModel:
 
     async def connect_wallet(self) -> str:
         wallets_list = self.connector.get_wallets()
-        wallet = wallets_list[0]
+        wallet = wallets_list[1]
         generated_url = await self.connector.connect(wallet)
         return generated_url
 
@@ -23,3 +23,9 @@ class AuthModel:
             )
             return address
         return None
+
+    @staticmethod
+    async def check_auth(session_id: str):
+        connector = get_connector(session_id)
+        is_connected = await connector.restore_connection()
+        return is_connected
