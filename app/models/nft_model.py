@@ -19,7 +19,7 @@ class NFTModel:
                 "metadata": res.metadata,
                 "address": res.address.to_userfriendly(is_bounceable=True),
                 "owner_address": res.owner.address.to_userfriendly(is_bounceable=True),
-                "next_item_index": res.next_item_index,
+                "items_count": res.next_item_index,
                 "previews": [
                     {"resolution": p.resolution, "url": p.url} for p in res.previews
                 ],
@@ -30,15 +30,22 @@ class NFTModel:
 
     async def fetch_item_data(self, item_address: str):
         try:
-            res = await self.tonapi.nft.get_item_by_address(account_id=item_address)
+            item = await self.tonapi.nft.get_item_by_address(account_id=item_address)
 
             return {
-                "address": res.address.to_userfriendly(is_bounceable=True),
-                "index": res.index,
-                "metadata": res.metadata,
-                "owner_address": res.owner.address.to_userfriendly(is_bounceable=True),
+                "address": item.address.to_userfriendly(is_bounceable=True),
+                "index": item.index,
+                "metadata": item.metadata,
+                "collection": {
+                    "address": item.collection.address.to_userfriendly(
+                        is_bounceable=True
+                    ),
+                    "name": item.collection.name,
+                    "description": item.collection.description,
+                },
+                "owner_address": item.owner.address.to_userfriendly(is_bounceable=True),
                 "previews": [
-                    {"resolution": p.resolution, "url": p.url} for p in res.previews
+                    {"resolution": p.resolution, "url": p.url} for p in item.previews
                 ],
             }
         except Exception as e:
@@ -57,6 +64,13 @@ class NFTModel:
                         "address": item.address.to_userfriendly(is_bounceable=True),
                         "index": item.index,
                         "metadata": item.metadata,
+                        "collection": {
+                            "address": item.collection.address.to_userfriendly(
+                                is_bounceable=True
+                            ),
+                            "name": item.collection.name,
+                            "description": item.collection.description,
+                        },
                         "owner_address": item.owner.address.to_userfriendly(
                             is_bounceable=True
                         ),

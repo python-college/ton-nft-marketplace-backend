@@ -18,11 +18,17 @@ class NFTCollectionMetadataSchema(BaseModel):
 
 
 class NFTCollectionSchema(BaseModel):
+    address: str
     metadata: NFTCollectionMetadataSchema
-    collection_address: str
     owner_address: str
     items_count: int
     previews: List[NFTPreviewSchema]
+
+
+class CollectionSchema(BaseModel):
+    address: str
+    name: str
+    description: str
 
 
 class NFTItemMetadataSchema(BaseModel):
@@ -35,8 +41,8 @@ class NFTItemMetadataSchema(BaseModel):
 class NFTItemSchema(BaseModel):
     address: str
     index: int
-    owner_address: str
-    collection: Optional[NFTCollectionSchema] = None
+    owner_address: Optional[str] = None
+    collection: Optional[CollectionSchema] = None
     metadata: NFTItemMetadataSchema
     previews: List[NFTPreviewSchema]
 

@@ -29,3 +29,32 @@ class MintCollectionSuccessPayload(BaseModel):
 class MintCollectionSuccessSchema(BaseModel):
     type: str = "mint_collection_success"
     payload: MintCollectionSuccessPayload
+
+
+class MintNftSchema(BaseModel):
+    session_id: str
+    name: str
+    description: str
+    collection_address: str
+    base64_image: str
+    image_name: Optional[str] = None
+    index: Optional[str] = None
+
+
+class MintNftUserRejectsSchema(BaseModel):
+    type: str = "mint_nft_user_rejects"
+    message: str = "User rejected transaction"
+
+
+class MintNftDataProcessedSchema(BaseModel):
+    type: str = "mint_nft_data_processed"
+    message: str = "Data successfully received and processed"
+
+
+class MintNftSuccessPayload(BaseModel):
+    index: int
+
+
+class MintNftSuccessSchema(BaseModel):
+    type: str = "mint_nft_success"
+    payload: MintNftSuccessPayload
