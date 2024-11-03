@@ -1,17 +1,23 @@
 from base64 import urlsafe_b64encode
 from datetime import datetime
 from tonsdk.utils import Address
-from tonutils.nft import CollectionStandardModified
-from tonutils.nft.content import CollectionModifiedOnchainContent
+from tonutils.nft import (
+    CollectionStandardModified,
+    CollectionEditableModified,
+)
+from tonutils.nft.content import (
+    CollectionModifiedOnchainContent,
+    NFTModifiedOnchainContent,
+)
 from tonutils.nft.royalty_params import RoyaltyParams
 from app.utils.auth_utils import get_connector
-from app.schemas.collection_management import MintCollectionSchema
+from app.schemas.management import MintCollectionSchema, MintNftSchema
 
 
-class ManagementCollectionModel:
+class ManagementModel:
 
     @staticmethod
-    async def create_collection(collection_data: MintCollectionSchema):
+    async def mint_collection(collection_data: MintCollectionSchema):
         connector = get_connector(collection_data.session_id)
         await connector.restore_connection()
 
@@ -51,3 +57,36 @@ class ManagementCollectionModel:
         await connector.send_transaction(transaction)
 
         return collection.address.to_str()
+
+    @staticmethod
+    async def mint_nft(nft_data: MintNftSchema):
+        connector = get_connector(nft_data.session_id)
+        await connector.restore_connection()
+
+        if not connector.connected:
+            raise PermissionError()
+
+        owner_address = connector.account.address
+
+        body = CollectionEditableModified.build_mint_body(
+            index=nft_data.index,
+            owner_address=Address(owner_address),
+            content=NFTModifiedOnchainContent(
+                name=nft_data.name,
+                description=nft_data.description,
+                image=f"https://ipfs.io/ipfs/{nft_data.image_name}",
+            ),
+        )
+
+        transaction = {
+            "valid_until": int(datetime.now().timestamp()) + 900,
+            "messages": [
+                {
+                    "address": nft_data.collection_address,
+                    "amount": "50000000",
+                    "payload": urlsafe_b64encode(body.to_boc()).decode(),
+                }
+            ],
+        }
+
+        await connector.send_transaction(transaction)
