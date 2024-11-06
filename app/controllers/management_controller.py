@@ -95,7 +95,7 @@ class ManagementController:
         nft_model = NFTModel()
         nft_data.index = int(
             (await nft_model.fetch_collection_data(nft_data.collection_address))[
-                "next_item_index"
+                "items_count"
             ]
         )
 
