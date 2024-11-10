@@ -5,13 +5,20 @@ from tonutils.nft import (
     CollectionStandardModified,
     CollectionEditableModified,
 )
+from tonutils.nft.marketplace.getgems.contract.salev3r3 import SaleV3R3
 from tonutils.nft.content import (
     CollectionModifiedOnchainContent,
     NFTModifiedOnchainContent,
 )
 from tonutils.nft.royalty_params import RoyaltyParams
 from app.utils.auth_utils import get_connector
-from app.schemas.management import MintCollectionSchema, MintNftSchema
+from app.schemas.management import MintCollectionSchema, MintNftSchema, SellNftSchema
+from app.settings import (
+    RAREBAY_ADDRESS,
+    RAREBAY_FEE_ADDRESS,
+    RAREBAY_FEE_RATE,
+    RAREBAY_DEPLOYER_ADDRESS,
+)
 
 
 class ManagementModel:
@@ -46,7 +53,7 @@ class ManagementModel:
             "messages": [
                 {
                     "address": collection.address.to_str(),
-                    "amount": "50000000",
+                    "amount": "250000000",
                     "stateInit": urlsafe_b64encode(
                         collection.state_init.serialize().to_boc()
                     ).decode(),
@@ -83,7 +90,48 @@ class ManagementModel:
             "messages": [
                 {
                     "address": nft_data.collection_address,
-                    "amount": "50000000",
+                    "amount": "250000000",
+                    "payload": urlsafe_b64encode(body.to_boc()).decode(),
+                }
+            ],
+        }
+
+        await connector.send_transaction(transaction)
+
+    @staticmethod
+    async def sell_nft(sell_data: SellNftSchema):
+        connector = get_connector(sell_data.session_id)
+        await connector.restore_connection()
+
+        if not connector.connected:
+            raise PermissionError()
+
+        marketplace_fee = int(sell_data.price * RAREBAY_FEE_RATE)
+        royalty_fee = int(sell_data.price * 0.1)
+
+        sale = SaleV3R3(
+            nft_address=sell_data.nft_address,
+            owner_address=connector.account.address,
+            marketplace_address=RAREBAY_ADDRESS,
+            marketplace_fee_address=RAREBAY_FEE_ADDRESS,
+            royalty_address=sell_data.royalty_address,
+            marketplace_fee=marketplace_fee,
+            royalty_fee=royalty_fee,
+            price=sell_data.price,
+        )
+
+        body = sale.build_transfer_nft_body(
+            destination=RAREBAY_DEPLOYER_ADDRESS,
+            owner_address=connector.account.address,
+            state_init=sale.state_init,
+        )
+
+        transaction = {
+            "valid_until": int(datetime.now().timestamp()) + 900,
+            "messages": [
+                {
+                    "address": sell_data.nft_address,
+                    "amount": "250000000",
                     "payload": urlsafe_b64encode(body.to_boc()).decode(),
                 }
             ],

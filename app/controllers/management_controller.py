@@ -13,6 +13,9 @@ from app.schemas.management import (
     MintNftDataProcessedSchema,
     MintNftSuccessSchema,
     MintNftSuccessPayload,
+    SellNftSchema,
+    SellNftUserRejectsSchema,
+    SellNftSuccessSchema,
 )
 from app.models.auth_model import AuthModel
 from app.models.management_model import ManagementModel
@@ -113,4 +116,46 @@ class ManagementController:
                 payload=MintNftSuccessPayload(index=nft_data.index)
             ).model_dump()
         )
+        await websocket.close()
+
+    @staticmethod
+    async def sell_nft(websocket: WebSocket):
+        await websocket.accept()
+
+        data = await websocket.receive_text()
+        try:
+            json_data = json.loads(data)
+            sell_data = SellNftSchema(**json_data)
+        except (json.JSONDecodeError, ValidationError):
+            await websocket.close(code=1008)
+            return
+
+        session_id = sell_data.session_id
+        if not await AuthModel.check_auth(session_id):
+            await websocket.close(code=3003)
+            return
+
+        nft_model = NFTModel()
+        try:
+            collection_address = (
+                await nft_model.fetch_item_data(sell_data.nft_address)
+            )["collection"]["address"]
+            royalty_address = (
+                await nft_model.fetch_collection_data(collection_address)
+            )["owner_address"]
+            sell_data.royalty_address = royalty_address
+        except Exception:
+            await websocket.close(code=1008)
+            return
+
+        try:
+            await ManagementModel.sell_nft(sell_data)
+        except PermissionError:
+            await websocket.close(code=3003)
+        except UserRejectsError:
+            await websocket.send_json(SellNftUserRejectsSchema().model_dump())
+            await websocket.close(code=4008)
+            return
+
+        await websocket.send_json(SellNftSuccessSchema().model_dump())
         await websocket.close()
