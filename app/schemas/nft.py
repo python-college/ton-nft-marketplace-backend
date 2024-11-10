@@ -7,6 +7,17 @@ class NFTPreviewSchema(BaseModel):
     url: HttpUrl
 
 
+class Price(BaseModel):
+    value: str
+    token_name: str
+
+
+class Sale(BaseModel):
+    contract_address: str
+    owner_address: Optional[str] = None
+    price: Price
+
+
 class NFTCollectionMetadataSchema(BaseModel):
     cover_image: Optional[HttpUrl] = None
     description: str = ""
@@ -44,6 +55,7 @@ class NFTItemSchema(BaseModel):
     owner_address: Optional[str] = None
     collection: Optional[CollectionSchema] = None
     metadata: NFTItemMetadataSchema
+    sale: Optional[Sale] = None
     previews: List[NFTPreviewSchema]
 
 
