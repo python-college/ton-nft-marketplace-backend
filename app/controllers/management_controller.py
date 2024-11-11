@@ -16,6 +16,9 @@ from app.schemas.management import (
     SellNftSchema,
     SellNftUserRejectsSchema,
     SellNftSuccessSchema,
+    BuyNftSchema,
+    BuyNftSuccessSchema,
+    BuyNftUserRejectsSchema,
 )
 from app.models.auth_model import AuthModel
 from app.models.management_model import ManagementModel
@@ -158,4 +161,51 @@ class ManagementController:
             return
 
         await websocket.send_json(SellNftSuccessSchema().model_dump())
+        await websocket.close()
+
+    @staticmethod
+    async def buy_nft(websocket: WebSocket):
+        await websocket.accept()
+
+        data = await websocket.receive_text()
+        try:
+            json_data = json.loads(data)
+            buy_data = BuyNftSchema(**json_data)
+        except (json.JSONDecodeError, ValidationError):
+            await websocket.close(code=1008)
+            return
+
+        session_id = buy_data.session_id
+        if not await AuthModel.check_auth(session_id):
+            await websocket.close(code=3003)
+            return
+
+        nft_model = NFTModel()
+        print(1)
+        try:
+            item_data = await nft_model.fetch_item_data(buy_data.nft_address)
+
+            if "sale" in item_data:
+                price = int(item_data["sale"]["price"]["value"])
+                contract_address = item_data["sale"]["contract_address"]
+                buy_data.price = price
+                buy_data.contract_address = contract_address
+            else:
+                await websocket.close(code=1008)
+                return
+
+        except Exception:
+            await websocket.close(code=1008)
+            return
+        print(4)
+        try:
+            await ManagementModel.buy_nft(buy_data)
+        except PermissionError:
+            await websocket.close(code=3003)
+        except UserRejectsError:
+            await websocket.send_json(BuyNftUserRejectsSchema().model_dump())
+            await websocket.close(code=4008)
+            return
+        print(5)
+        await websocket.send_json(BuyNftSuccessSchema().model_dump())
         await websocket.close()

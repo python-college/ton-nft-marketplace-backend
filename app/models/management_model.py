@@ -5,6 +5,7 @@ from tonutils.nft import (
     CollectionStandardModified,
     CollectionEditableModified,
 )
+from pytoniq_core import begin_cell
 from tonutils.nft.marketplace.getgems.contract.salev3r3 import SaleV3R3
 from tonutils.nft.content import (
     CollectionModifiedOnchainContent,
@@ -12,7 +13,12 @@ from tonutils.nft.content import (
 )
 from tonutils.nft.royalty_params import RoyaltyParams
 from app.utils.auth_utils import get_connector
-from app.schemas.management import MintCollectionSchema, MintNftSchema, SellNftSchema
+from app.schemas.management import (
+    MintCollectionSchema,
+    MintNftSchema,
+    SellNftSchema,
+    BuyNftSchema,
+)
 from app.settings import (
     RAREBAY_ADDRESS,
     RAREBAY_FEE_ADDRESS,
@@ -137,4 +143,24 @@ class ManagementModel:
             ],
         }
 
+        await connector.send_transaction(transaction)
+
+    @staticmethod
+    async def buy_nft(buy_data: BuyNftSchema):
+        connector = get_connector(buy_data.session_id)
+        await connector.restore_connection()
+
+        if not connector.connected:
+            raise PermissionError()
+
+        transaction = {
+            "valid_until": int(datetime.now().timestamp()) + 900,
+            "messages": [
+                {
+                    "address": buy_data.contract_address,
+                    "amount": str(buy_data.price + 300000000),
+                    "payload": urlsafe_b64encode(b"\x00\x00\x00\x02").decode(),
+                }
+            ],
+        }
         await connector.send_transaction(transaction)

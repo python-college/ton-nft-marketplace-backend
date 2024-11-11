@@ -17,3 +17,8 @@ async def create_nft(websocket: WebSocket):
 @router.websocket("/ws/sell/nft")
 async def sell_nft(websocket: WebSocket):
     await ManagementController.sell_nft(websocket)
+
+
+@router.websocket("/ws/buy/nft")
+async def buy_nft(websocket: WebSocket):
+    await ManagementController.buy_nft(websocket)
