@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 
+SESSION_ID_LENGTH = 32
+
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
