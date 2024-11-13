@@ -1,6 +1,8 @@
 import os
 from dotenv import load_dotenv
 
+SESSION_ID_LENGTH = 32
+
 load_dotenv()
 
 API_KEY = os.getenv("API_KEY")
@@ -15,3 +17,9 @@ REDIS_PASSWORD = os.getenv("REDIS_PASSWORD")
 
 PINATA_API_KEY = os.getenv("PINATA_API_KEY")
 PINATA_API_SECRET = os.getenv("PINATA_API_SECRET")
+
+RAREBAY_ADDRESS = os.getenv("RAREBAY_ADDRESS")
+RAREBAY_FEE_ADDRESS = os.getenv("RAREBAY_FEE_ADDRESS")
+RAREBAY_DEPLOYER_ADDRESS = os.getenv("RAREBAY_DEPLOYER_ADDRESS")
+
+RAREBAY_FEE_RATE = 0.05

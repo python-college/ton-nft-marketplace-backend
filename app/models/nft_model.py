@@ -10,29 +10,63 @@ class NFTModel:
         )
 
     async def fetch_collection_data(self, collection_address: str):
-        try:
-            res = await self.tonapi.nft.get_collection_by_collection_address(
-                account_id=collection_address
-            )
+        res = await self.tonapi.nft.get_collection_by_collection_address(
+            account_id=collection_address
+        )
 
-            return {
-                "metadata": res.metadata,
-                "address": res.address.to_userfriendly(is_bounceable=True),
-                "owner_address": res.owner.address.to_userfriendly(is_bounceable=True),
-                "items_count": res.next_item_index,
-                "previews": [
-                    {"resolution": p.resolution, "url": p.url} for p in res.previews
-                ],
-            }
-        except Exception as e:
-            print(f"Error fetching collection: {e}")
-            return None
+        return {
+            "metadata": res.metadata,
+            "address": res.address.to_userfriendly(is_bounceable=True),
+            "owner_address": res.owner.address.to_userfriendly(is_bounceable=True),
+            "items_count": res.next_item_index,
+            "previews": [
+                {"resolution": p.resolution, "url": p.url} for p in res.previews
+            ],
+        }
 
     async def fetch_item_data(self, item_address: str):
-        try:
-            item = await self.tonapi.nft.get_item_by_address(account_id=item_address)
+        item = await self.tonapi.nft.get_item_by_address(account_id=item_address)
 
-            return {
+        item_data = {
+            "address": item.address.to_userfriendly(is_bounceable=True),
+            "index": item.index,
+            "metadata": item.metadata,
+            "collection": {
+                "address": item.collection.address.to_userfriendly(is_bounceable=True),
+                "name": item.collection.name,
+                "description": item.collection.description,
+            },
+            "owner_address": item.owner.address.to_userfriendly(is_bounceable=True),
+            "previews": [
+                {"resolution": p.resolution, "url": p.url} for p in item.previews
+            ],
+        }
+        if item.sale is not None:
+            item_data["sale"] = {
+                "contract_address": item.sale.address.to_userfriendly(
+                    is_bounceable=True
+                ),
+                "price": {
+                    "value": item.sale.price.value,
+                    "token_name": item.sale.price.token_name,
+                },
+            }
+            if item.sale.owner is not None:
+                item_data["sale"]["owner_address"] = (
+                    item.sale.owner.address.to_userfriendly(is_bounceable=True)
+                )
+
+        return item_data
+
+    async def fetch_items_by_collection(self, collection_address: str):
+
+        res = await self.tonapi.nft.get_items_by_collection_address(
+            account_id=collection_address
+        )
+
+        nft_items = []
+        for item in res.nft_items:
+            item_data = {
                 "address": item.address.to_userfriendly(is_bounceable=True),
                 "index": item.index,
                 "metadata": item.metadata,
@@ -48,40 +82,24 @@ class NFTModel:
                     {"resolution": p.resolution, "url": p.url} for p in item.previews
                 ],
             }
-        except Exception as e:
-            print(f"Error fetching collection: {e}")
-            return None
 
-    async def fetch_items_by_collection(self, collection_address: str):
-        try:
-            res = await self.tonapi.nft.get_items_by_collection_address(
-                account_id=collection_address
-            )
+            if item.sale is not None:
+                sale_data = {
+                    "contract_address": item.sale.address.to_userfriendly(
+                        is_bounceable=True
+                    ),
+                    "price": {
+                        "value": item.sale.price.value,
+                        "token_name": item.sale.price.token_name,
+                    },
+                }
+                if item.sale.owner is not None:
+                    sale_data["owner_address"] = (
+                        item.sale.owner.address.to_userfriendly(is_bounceable=True)
+                    )
 
-            return {
-                "nft_items": [
-                    {
-                        "address": item.address.to_userfriendly(is_bounceable=True),
-                        "index": item.index,
-                        "metadata": item.metadata,
-                        "collection": {
-                            "address": item.collection.address.to_userfriendly(
-                                is_bounceable=True
-                            ),
-                            "name": item.collection.name,
-                            "description": item.collection.description,
-                        },
-                        "owner_address": item.owner.address.to_userfriendly(
-                            is_bounceable=True
-                        ),
-                        "previews": [
-                            {"resolution": p.resolution, "url": p.url}
-                            for p in item.previews
-                        ],
-                    }
-                    for item in res.nft_items
-                ]
-            }
-        except Exception as e:
-            print(f"Error fetching items: {e}")
-            return None
+                item_data["sale"] = sale_data
+
+            nft_items.append(item_data)
+
+        return {"nft_items": nft_items}
