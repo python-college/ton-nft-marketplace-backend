@@ -13,12 +13,10 @@ from tonutils.nft.content import (
 )
 from tonutils.nft.royalty_params import RoyaltyParams
 from app.utils.auth_utils import get_connector
-from app.schemas.management import (
-    MintCollectionSchema,
-    MintNftSchema,
-    SellNftSchema,
-    BuyNftSchema,
-)
+from app.schemas.management.mint import MintCollectionSchema, MintNftSchema
+from app.schemas.management.sell import SellNftSchema
+from app.schemas.management.buy import BuyNftSchema
+
 from app.settings import (
     RAREBAY_ADDRESS,
     RAREBAY_FEE_ADDRESS,

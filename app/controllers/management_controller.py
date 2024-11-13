@@ -2,7 +2,7 @@ import json
 from fastapi import WebSocket
 from pydantic import ValidationError
 from pytonconnect.exceptions import UserRejectsError
-from app.schemas.management import (
+from app.schemas.management.mint import (
     MintCollectionSchema,
     MintCollectionUserRejectsSchema,
     MintCollectionDataProcessedSchema,
@@ -13,12 +13,16 @@ from app.schemas.management import (
     MintNftDataProcessedSchema,
     MintNftSuccessSchema,
     MintNftSuccessPayload,
+)
+from app.schemas.management.sell import (
     SellNftSchema,
     SellNftUserRejectsSchema,
     SellNftSuccessSchema,
+)
+from app.schemas.management.buy import (
     BuyNftSchema,
-    BuyNftSuccessSchema,
     BuyNftUserRejectsSchema,
+    BuyNftSuccessSchema,
 )
 from app.models.auth_model import AuthModel
 from app.models.management_model import ManagementModel
@@ -181,7 +185,7 @@ class ManagementController:
             return
 
         nft_model = NFTModel()
-        print(1)
+
         try:
             item_data = await nft_model.fetch_item_data(buy_data.nft_address)
 
@@ -197,7 +201,7 @@ class ManagementController:
         except Exception:
             await websocket.close(code=1008)
             return
-        print(4)
+
         try:
             await ManagementModel.buy_nft(buy_data)
         except PermissionError:
@@ -206,6 +210,6 @@ class ManagementController:
             await websocket.send_json(BuyNftUserRejectsSchema().model_dump())
             await websocket.close(code=4008)
             return
-        print(5)
+
         await websocket.send_json(BuyNftSuccessSchema().model_dump())
         await websocket.close()

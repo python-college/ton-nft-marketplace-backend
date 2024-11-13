@@ -58,35 +58,3 @@ class MintNftSuccessPayload(BaseModel):
 class MintNftSuccessSchema(BaseModel):
     type: str = "mint_nft_success"
     payload: MintNftSuccessPayload
-
-
-class SellNftSchema(BaseModel):
-    session_id: str
-    nft_address: str
-    price: int
-    royalty_address: Optional[str] = None
-
-
-class SellNftUserRejectsSchema(BaseModel):
-    type: str = "sell_nft_user_rejects"
-    message: str = "User rejected transaction"
-
-
-class SellNftSuccessSchema(BaseModel):
-    type: str = "sell_nft_success"
-
-
-class BuyNftSchema(BaseModel):
-    session_id: str
-    nft_address: str
-    price: Optional[int] = None
-    contract_address: Optional[str] = None
-
-
-class BuyNftUserRejectsSchema(BaseModel):
-    type: str = "buy_nft_user_rejects"
-    message: str = "User rejected transaction"
-
-
-class BuyNftSuccessSchema(BaseModel):
-    type: str = "buy_nft_success"
