@@ -20,5 +20,5 @@ jobs:
         run: |
           docker run --rm --name nft-backend -d nft-backend-image
           sleep 5
-          docker logs nft-backend-image
-          docker ps | grep nft-backend-image
+          docker logs nft-backend
+          docker ps | grep nft-backend
