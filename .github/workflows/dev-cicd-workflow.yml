@@ -2,11 +2,11 @@ name: Dev CI/CD
 on:
   push:
     branches: [ "dev" ]
-  pull_request:
-    branches: [ "dev" ]
+  workflow_dispatch:
 
 jobs:
   test_build_job:
+    name: Test Build
     runs-on: ubuntu-latest
 
     steps:
@@ -19,6 +19,29 @@ jobs:
       - name: Run Docker container
         run: |
           docker run --rm --name nft-backend -d nft-backend-image
-          sleep 5
+          sleep 10
           docker logs nft-backend
           docker ps | grep nft-backend
+          docker stop nft-backend
+  
+  deploy_dev_job:
+    needs: test_build_job
+    name: Deploy to Development server
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+      - name: Connect to server
+        uses: appleboy/ssh-action@v1.1.0
+        with:
+          host: ${{ secrets.HOST }}
+          username: ${{ secrets.USERNAME }}
+          password: ${{ secrets.PASSWORD }}
+          script_stop: true
+          script: |
+            cd projects/nft-backend/
+            git checkout dev
+            git pull
+            docker-compose up -d --build
+
+
