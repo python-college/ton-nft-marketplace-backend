@@ -11,10 +11,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-      - name: Set up Python 3.12
-        uses: actions/setup-python@v5
-        with:
-          python-version: '3.12'
       
       - name: Build Docker container
         run: |
@@ -22,7 +18,7 @@ jobs:
       
       - name: Run Docker container
         run: |
-          docker run --rm nft-backend-image -d
+          docker run --rm -d nft-backend-image
           sleep 5
           docker logs nft-backend-image
           docker ps | grep nft-backend-image
