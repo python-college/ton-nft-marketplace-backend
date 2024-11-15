@@ -1,0 +1,105 @@
+from pytonapi import AsyncTonapi
+from app.settings import IS_TESTNET, API_KEY
+
+
+class NFTModel:
+    def __init__(self):
+        self.tonapi = AsyncTonapi(
+            api_key=API_KEY,
+            is_testnet=IS_TESTNET,
+        )
+
+    async def fetch_collection_data(self, collection_address: str):
+        res = await self.tonapi.nft.get_collection_by_collection_address(
+            account_id=collection_address
+        )
+
+        return {
+            "metadata": res.metadata,
+            "address": res.address.to_userfriendly(is_bounceable=True),
+            "owner_address": res.owner.address.to_userfriendly(is_bounceable=True),
+            "items_count": res.next_item_index,
+            "previews": [
+                {"resolution": p.resolution, "url": p.url} for p in res.previews
+            ],
+        }
+
+    async def fetch_item_data(self, item_address: str):
+        item = await self.tonapi.nft.get_item_by_address(account_id=item_address)
+
+        item_data = {
+            "address": item.address.to_userfriendly(is_bounceable=True),
+            "index": item.index,
+            "metadata": item.metadata,
+            "collection": {
+                "address": item.collection.address.to_userfriendly(is_bounceable=True),
+                "name": item.collection.name,
+                "description": item.collection.description,
+            },
+            "owner_address": item.owner.address.to_userfriendly(is_bounceable=True),
+            "previews": [
+                {"resolution": p.resolution, "url": p.url} for p in item.previews
+            ],
+        }
+        if item.sale is not None:
+            item_data["sale"] = {
+                "contract_address": item.sale.address.to_userfriendly(
+                    is_bounceable=True
+                ),
+                "price": {
+                    "value": item.sale.price.value,
+                    "token_name": item.sale.price.token_name,
+                },
+            }
+            if item.sale.owner is not None:
+                item_data["sale"]["owner_address"] = (
+                    item.sale.owner.address.to_userfriendly(is_bounceable=True)
+                )
+
+        return item_data
+
+    async def fetch_items_by_collection(self, collection_address: str):
+
+        res = await self.tonapi.nft.get_items_by_collection_address(
+            account_id=collection_address
+        )
+
+        nft_items = []
+        for item in res.nft_items:
+            item_data = {
+                "address": item.address.to_userfriendly(is_bounceable=True),
+                "index": item.index,
+                "metadata": item.metadata,
+                "collection": {
+                    "address": item.collection.address.to_userfriendly(
+                        is_bounceable=True
+                    ),
+                    "name": item.collection.name,
+                    "description": item.collection.description,
+                },
+                "owner_address": item.owner.address.to_userfriendly(is_bounceable=True),
+                "previews": [
+                    {"resolution": p.resolution, "url": p.url} for p in item.previews
+                ],
+            }
+
+            if item.sale is not None:
+                sale_data = {
+                    "contract_address": item.sale.address.to_userfriendly(
+                        is_bounceable=True
+                    ),
+                    "price": {
+                        "value": item.sale.price.value,
+                        "token_name": item.sale.price.token_name,
+                    },
+                }
+                if item.sale.owner is not None:
+                    sale_data["owner_address"] = (
+                        item.sale.owner.address.to_userfriendly(is_bounceable=True)
+                    )
+
+                item_data["sale"] = sale_data
+
+            nft_items.append(item_data)
+
+        return {"nft_items": nft_items}
