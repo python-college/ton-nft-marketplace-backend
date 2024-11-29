@@ -112,24 +112,6 @@ services:
       MONGO_INITDB_ROOT_PASSWORD: ${MONGO_DB_USER_PASSWORD}
     networks:
       - content_network
-      - mongo_net
-  
-  mongo-express:
-    image: mongo-express:latest
-    container_name: mongo-express
-    restart: unless-stopped
-    ports:
-      - 8101:8081
-    environment:
-      ME_CONFIG_MONGODB_ADMINUSERNAME: ${MONGO_EXPRESS_ADMIN_NAME}
-      ME_CONFIG_MONGODB_ADMINPASSWORD: ${MONGO_EXPRESS_ADMIN_PASSWORD}
-      ME_CONFIG_MONGODB_SERVER: ${MONGO_HOST}
-      ME_CONFIG_MONGODB_URL: mongodb://${MONGO_DB_USER}:${MONGO_DB_USER_PASSWORD}@${MONGO_HOST}
-      ME_CONFIG_BASICAUTH: false
-    depends_on:
-      - mongo_content_db
-    networks:
-      - mongo_net
 
 volumes:
   redis-main-data:
@@ -143,6 +125,4 @@ networks:
   content_network:
     driver: bridge
   main_network:
-    driver: bridge
-  mongo_net:
     driver: bridge
