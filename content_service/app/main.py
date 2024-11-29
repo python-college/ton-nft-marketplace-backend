@@ -9,6 +9,6 @@ async def lifespan(app: FastAPI):
     yield
     MongoDB.close_mongo_connection()
 
-app = FastAPI(title="Content Service", lifespan=lifespan)
+app = FastAPI(title="Content Service", lifespan=lifespan, root_path="/content")
 
 app.include_router(v1_router, prefix="/api/v1")
