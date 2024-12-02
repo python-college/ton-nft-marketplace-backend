@@ -106,3 +106,61 @@ class TonApiService:
             nft_items.append(item_data)
 
         return nft_items
+    
+    async def fetch_account_data(self, account_address: str) -> dict:
+        res = await self.tonapi.accounts.get_info(
+            account_id=account_address
+        )
+
+        return {
+            "raw_address": res.address.to_raw(),
+            "address": res.address.to_userfriendly(is_bounceable=True),
+            "last_activity": res.last_activity,
+            "balance": str(res.balance)
+        }
+    
+    async def fetch_account_items(self, account_address: str) -> list[dict]:
+        res = await self.tonapi.accounts.get_all_nfts(
+            account_id=account_address
+        )
+
+        nft_items = []
+        for item in res.nft_items:
+            item_data = {
+                "raw_address": item.address.to_raw(),
+                "address": item.address.to_userfriendly(is_bounceable=True),
+                "index": item.index,
+                "metadata": item.metadata,
+                "collection": {
+                    "address": item.collection.address.to_userfriendly(
+                        is_bounceable=True
+                    ),
+                    "name": item.collection.name,
+                    "description": item.collection.description,
+                },
+                "owner_address": item.owner.address.to_userfriendly(is_bounceable=True),
+                "previews": [
+                    {"resolution": p.resolution, "url": p.url} for p in item.previews
+                ],
+            }
+
+            if item.sale is not None:
+                sale_data = {
+                    "contract_address": item.sale.address.to_userfriendly(
+                        is_bounceable=True
+                    ),
+                    "price": {
+                        "value": item.sale.price.value,
+                        "token_name": item.sale.price.token_name,
+                    },
+                }
+                if item.sale.owner is not None:
+                    sale_data["owner_address"] = (
+                        item.sale.owner.address.to_userfriendly(is_bounceable=True)
+                    )
+
+                item_data["sale"] = sale_data
+
+            nft_items.append(item_data)
+
+        return nft_items
