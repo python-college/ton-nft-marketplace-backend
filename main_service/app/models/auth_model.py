@@ -28,4 +28,7 @@ class AuthModel:
     async def check_auth(session_id: str):
         connector = get_connector(session_id)
         is_connected = await connector.restore_connection()
-        return is_connected
+        if is_connected:
+            return connector.account.address
+        else:
+            return None
