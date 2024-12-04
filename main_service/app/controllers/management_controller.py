@@ -26,7 +26,7 @@ from app.schemas.management.buy import (
 )
 from app.models.auth_model import AuthModel
 from app.models.management_model import ManagementModel
-from app.models.nft_model import NFTModel
+from app.services.content_client import ContentServiceClient
 from app.services.pinata_client import PinataClient
 
 
@@ -79,6 +79,7 @@ class ManagementController:
     @staticmethod
     async def create_nft(websocket: WebSocket):
         await websocket.accept()
+        content_service_client = ContentServiceClient()
 
         data = await websocket.receive_text()
         try:
@@ -102,9 +103,8 @@ class ManagementController:
 
         nft_data.image_name = image_filename
 
-        nft_model = NFTModel()
         nft_data.index = int(
-            (await nft_model.fetch_collection_data(nft_data.collection_address))[
+            (await content_service_client.fetch_collection(nft_data.collection_address))[
                 "items_count"
             ]
         )
@@ -128,6 +128,7 @@ class ManagementController:
     @staticmethod
     async def sell_nft(websocket: WebSocket):
         await websocket.accept()
+        content_service_client = ContentServiceClient()
 
         data = await websocket.receive_text()
         try:
@@ -142,17 +143,16 @@ class ManagementController:
             await websocket.close(code=3003)
             return
 
-        nft_model = NFTModel()
         try:
-            collection_address = (
-                await nft_model.fetch_item_data(sell_data.nft_address)
-            )["collection"]["address"]
-            royalty_address = (
-                await nft_model.fetch_collection_data(collection_address)
-            )["owner_address"]
+            item_data = await content_service_client.fetch_item(sell_data.nft_address)
+            collection_address = item_data["collection"]["address"]
+            
+            collection_data = await content_service_client.fetch_collection(collection_address)
+            royalty_address = collection_data["owner_address"]
+
             sell_data.royalty_address = royalty_address
         except Exception:
-            await websocket.close(code=1008)
+            await websocket.close(code=4004)
             return
 
         try:
@@ -170,6 +170,7 @@ class ManagementController:
     @staticmethod
     async def buy_nft(websocket: WebSocket):
         await websocket.accept()
+        content_service_client = ContentServiceClient()
 
         data = await websocket.receive_text()
         try:
@@ -184,10 +185,9 @@ class ManagementController:
             await websocket.close(code=3003)
             return
 
-        nft_model = NFTModel()
 
         try:
-            item_data = await nft_model.fetch_item_data(buy_data.nft_address)
+            item_data = await content_service_client.fetch_item(buy_data.nft_address)
 
             if "sale" in item_data:
                 price = int(item_data["sale"]["price"]["value"])

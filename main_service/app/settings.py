@@ -5,6 +5,8 @@ SESSION_ID_LENGTH = 32
 
 load_dotenv()
 
+CONTENT_SERVICE_HOST = os.getenv("CONTENT_SERVICE_HOST")
+
 API_KEY = os.getenv("API_KEY")
 IS_TESTNET = os.getenv("IS_TESTNET") == "True"
 MANIFEST_URL = os.getenv("MANIFEST_URL")
