@@ -2,7 +2,7 @@ from pydantic_settings import BaseSettings
 
 
 class Settings(BaseSettings):
-    MONGO_URL: str
+    MONGO_HOST: str
     MONGO_DB_NAME: str
 
     TON_API_KEY: str

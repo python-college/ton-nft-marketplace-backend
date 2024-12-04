@@ -73,7 +73,27 @@ class TopNFTItemsSchema(BaseModel):
     page: int
     page_size: int
 
+
 class TopNFTCollectionSchema(BaseModel):
+    collections: List[NFTCollectionSchema] = []
+    total_count: int
+    page: int
+    page_size: int
+
+class AccountSchema(BaseModel):
+    address: str
+    balance: int
+    last_activity: int
+
+
+class SearchNFTItemsSchema(BaseModel):
+    nft_items: List[NFTItemSchema]
+    total_count: int
+    page: int
+    page_size: int
+
+
+class SearchNFTCollectionSchema(BaseModel):
     collections: List[NFTCollectionSchema] = []
     total_count: int
     page: int

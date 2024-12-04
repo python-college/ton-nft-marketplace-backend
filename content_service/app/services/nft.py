@@ -2,7 +2,7 @@ from tonsdk.utils import Address
 from pytonapi.exceptions import TONAPINotFoundError
 from app.repositories.nft import NFTRepository
 from app.services.ton_api import TonApiService
-from app.schemas import NFTItemSchema, NFTItemsSchema, TopNFTItemsSchema
+from app.schemas import NFTItemSchema, NFTItemsSchema, TopNFTItemsSchema, SearchNFTItemsSchema
 
 
 class NFTService:
@@ -65,3 +65,6 @@ class NFTService:
         return await NFTRepository.get_top_hyped_nfts(page=page, page_size=page_size)
 
 
+    @staticmethod
+    async def search_items(name: str, page: int = 1, page_size: int = 20) -> SearchNFTItemsSchema:
+        return await NFTRepository.search_nfts(name=name, page=page, page_size=page_size)

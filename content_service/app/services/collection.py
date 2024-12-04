@@ -2,7 +2,7 @@ from tonsdk.utils import Address
 from pytonapi.exceptions import TONAPINotFoundError
 from app.services.ton_api import TonApiService
 from app.repositories.collection import CollectionRepository
-from app.schemas import NFTCollectionSchema, TopNFTCollectionSchema
+from app.schemas import NFTCollectionSchema, TopNFTCollectionSchema, SearchNFTCollectionSchema
 
 class CollectionService:
     @staticmethod
@@ -32,3 +32,7 @@ class CollectionService:
     @staticmethod
     async def get_most_hype_collections(page: int = 1, page_size: int = 20) -> TopNFTCollectionSchema:
         return await CollectionRepository.get_most_hype_collections(page=page, page_size=page_size)
+    
+    @staticmethod
+    async def search_collections(name: str, page: int = 1, page_size: int = 20) -> SearchNFTCollectionSchema:
+        return await CollectionRepository.search_collections(name=name, page=page, page_size=page_size)

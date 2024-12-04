@@ -1,6 +1,6 @@
 from bson import ObjectId
 from app.core.db import MongoDB
-from app.schemas import NFTCollectionSchema, TopNFTCollectionSchema
+from app.schemas import NFTCollectionSchema, TopNFTCollectionSchema, SearchNFTCollectionSchema
 
 class CollectionRepository:
     """
@@ -65,6 +65,32 @@ class CollectionRepository:
 
         return TopNFTCollectionSchema(
             collections=[NFTCollectionSchema(**collection) for collection in collections],
+            total_count=total_count,
+            page=page,
+            page_size=page_size
+        )
+
+    @staticmethod
+    async def search_collections(name: str, page: int = 1, page_size: int = 20) -> SearchNFTCollectionSchema:
+        """
+        Выполняет поиск коллекций по названию с пагинацией.
+
+        Использует регулярное выражение для частичного совпадения.
+
+        :param name: Название или его часть для поиска.
+        :param page: Номер страницы (по умолчанию 1).
+        :param page_size: Количество элементов на странице (по умолчанию 20).
+        :return: Объект SearchNFTCollectionSchema, содержащий коллекции, общее количество и данные пагинации.
+        """
+        skip = (page - 1) * page_size
+        query = {"metadata.name": {"$regex": name, "$options": "i"}}
+
+        cursor = MongoDB.db["collections"].find(query).sort("hype", -1).skip(skip).limit(page_size)
+        nfts = await cursor.to_list(length=page_size)
+        total_count = await MongoDB.db["collections"].count_documents(query)
+
+        return SearchNFTCollectionSchema(
+            collections=[NFTCollectionSchema(**nft) for nft in nfts],
             total_count=total_count,
             page=page,
             page_size=page_size

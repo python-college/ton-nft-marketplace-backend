@@ -7,7 +7,7 @@ class MongoDB:
 
     @staticmethod
     def connect_to_mongo():
-        MongoDB.client = AsyncIOMotorClient(settings.MONGO_URL)
+        MongoDB.client = AsyncIOMotorClient(settings.MONGO_HOST)
         MongoDB.db = MongoDB.client[settings.MONGO_DB_NAME]
 
     @staticmethod
