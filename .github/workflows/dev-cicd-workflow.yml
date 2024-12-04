@@ -30,7 +30,11 @@ jobs:
       
       - name: Run content-service container
         run: |
-          docker run --rm --name nft-content-service -d content-service-image
+          docker run -e TON_API_KEY="TON_API_KEY" \
+          -e MONGO_HOST="MONGO_HOST" \
+          -e MONGO_DB_NAME="MONGO_DB_NAME" \
+          -e IS_TESTNET=True \
+          --rm -d --name nft-content-service content-service-image
           sleep 10
           docker logs nft-content-service
           docker ps | grep nft-content-service
