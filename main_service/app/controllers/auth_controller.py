@@ -1,4 +1,5 @@
-from fastapi import WebSocket
+from fastapi import WebSocket, HTTPException
+from tonsdk.utils import Address
 from app.utils.auth_utils import generate_session_id
 from app.models.auth_model import AuthModel
 from app.schemas.auth import (
@@ -8,7 +9,7 @@ from app.schemas.auth import (
     AuthSuccessPayload,
     AuthUserRejectsSchema,
 )
-
+from app.schemas.auth import AuthSuccessSchema
 
 class AuthController:
 
@@ -36,3 +37,13 @@ class AuthController:
             await websocket.close(code=4008)
 
         await websocket.close()
+
+    @staticmethod
+    async def check_auth(session_id: str):
+        address = await AuthModel.check_auth(session_id)
+        if address is not None:
+            return AuthSuccessSchema(payload=AuthSuccessPayload(address=Address(address).to_string(
+                is_bounceable=True, is_user_friendly=True
+            ), session_id=session_id))
+        else:
+            raise HTTPException(status_code=403, detail="Session not found")
