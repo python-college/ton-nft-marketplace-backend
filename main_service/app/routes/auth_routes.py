@@ -11,5 +11,5 @@ async def auth_websocket(websocket: WebSocket):
 
 
 @router.get("/check-auth")
-async def chech_auth(session_id: str = Header(...)):
+async def check_auth(session_id: str = Header(...)):
     return await AuthController.check_auth(session_id)
