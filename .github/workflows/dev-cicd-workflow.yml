@@ -12,17 +12,29 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       
-      - name: Build Docker container
+      - name: Build main-service container
         run: |
-          docker build -t nft-backend-image .
+          docker build -t nft-main-service-image ./main_service
       
-      - name: Run Docker container
+      - name: Run main-service container
         run: |
-          docker run --rm --name nft-backend -d nft-backend-image
+          docker run --rm --name nft-main-service -d nft-main-service-image
           sleep 10
-          docker logs nft-backend
-          docker ps | grep nft-backend
-          docker stop nft-backend
+          docker logs nft-main-service
+          docker ps | grep nft-main-service
+          docker stop nft-main-service
+      
+      - name: Build content-service container
+        run: |
+          docker build -t content-service-image ./content_service
+      
+      - name: Run content-service container
+        run: |
+          docker run --rm --name nft-content-service -d content-service-image
+          sleep 10
+          docker logs nft-content-service
+          docker ps | grep nft-content-service
+          docker stop nft-content-service
   
   deploy_dev_job:
     needs: test_build_job
@@ -42,6 +54,7 @@ jobs:
             cd projects/nft-backend/
             git checkout dev
             git pull
+            cd docker/
             docker-compose up -d --build
 
 
