@@ -1,4 +1,4 @@
-from tonsdk.utils import Address
+from pytoniq_core import Address
 from app.utils.auth_utils import get_connector
 
 
@@ -18,7 +18,7 @@ class AuthModel:
         await self.connector.restore_connection()
         await self.connector.wait_for_connection()
         if self.connector.connected and self.connector.account.address:
-            address = Address(self.connector.account.address).to_string(
+            address = Address(self.connector.account.address).to_str(
                 is_bounceable=True, is_user_friendly=True
             )
             return address

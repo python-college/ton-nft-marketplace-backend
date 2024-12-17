@@ -1,5 +1,5 @@
 from fastapi import WebSocket, HTTPException
-from tonsdk.utils import Address
+from pytoniq_core import Address
 from app.utils.auth_utils import generate_session_id
 from app.models.auth_model import AuthModel
 from app.schemas.auth import (
@@ -42,7 +42,7 @@ class AuthController:
     async def check_auth(session_id: str):
         address = await AuthModel.check_auth(session_id)
         if address is not None:
-            return AuthSuccessSchema(payload=AuthSuccessPayload(address=Address(address).to_string(
+            return AuthSuccessSchema(payload=AuthSuccessPayload(address=Address(address).to_str(
                 is_bounceable=True, is_user_friendly=True
             ), session_id=session_id))
         else:
