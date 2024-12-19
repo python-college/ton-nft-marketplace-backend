@@ -2,7 +2,7 @@ from pytoniq_core import Address
 from app.utils.auth_utils import get_connector
 
 
-class AuthModel:
+class AuthService:
     def __init__(self, session_id: str):
         self.session_id = session_id
         self.connector = get_connector(session_id)

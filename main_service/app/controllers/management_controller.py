@@ -24,8 +24,8 @@ from app.schemas.management.buy import (
     BuyNftUserRejectsSchema,
     BuyNftSuccessSchema,
 )
-from app.models.auth_model import AuthModel
-from app.models.management_model import ManagementModel
+from app.services.auth_service import AuthService
+from app.services.management_service import ManagementService
 from app.services.content_client import ContentServiceClient
 from app.services.pinata_client import PinataClient
 
@@ -45,7 +45,7 @@ class ManagementController:
             return
 
         session_id = collection_data.session_id
-        if not await AuthModel.check_auth(session_id):
+        if not await AuthService.check_auth(session_id):
             await websocket.close(code=3003)
             return
 
@@ -59,7 +59,7 @@ class ManagementController:
         collection_data.image_name = image_filename
 
         try:
-            collection_address = await ManagementModel.mint_collection(collection_data)
+            collection_address = await ManagementService.mint_collection(collection_data)
         except PermissionError:
             await websocket.close(code=3003)
         except UserRejectsError:
@@ -90,7 +90,7 @@ class ManagementController:
             return
 
         session_id = nft_data.session_id
-        if not await AuthModel.check_auth(session_id):
+        if not await AuthService.check_auth(session_id):
             await websocket.close(code=3003)
             return
 
@@ -110,7 +110,7 @@ class ManagementController:
         )
 
         try:
-            await ManagementModel.mint_nft(nft_data)
+            await ManagementService.mint_nft(nft_data)
         except PermissionError:
             await websocket.close(code=3003)
         except UserRejectsError:
@@ -139,7 +139,7 @@ class ManagementController:
             return
 
         session_id = sell_data.session_id
-        if not await AuthModel.check_auth(session_id):
+        if not await AuthService.check_auth(session_id):
             await websocket.close(code=3003)
             return
 
@@ -156,7 +156,7 @@ class ManagementController:
             return
 
         try:
-            await ManagementModel.sell_nft(sell_data)
+            await ManagementService.sell_nft(sell_data)
         except PermissionError:
             await websocket.close(code=3003)
         except UserRejectsError:
@@ -181,7 +181,7 @@ class ManagementController:
             return
 
         session_id = buy_data.session_id
-        if not await AuthModel.check_auth(session_id):
+        if not await AuthService.check_auth(session_id):
             await websocket.close(code=3003)
             return
 
@@ -203,7 +203,7 @@ class ManagementController:
             return
 
         try:
-            await ManagementModel.buy_nft(buy_data)
+            await ManagementService.buy_nft(buy_data)
         except PermissionError:
             await websocket.close(code=3003)
         except UserRejectsError:
