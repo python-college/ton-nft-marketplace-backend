@@ -1,4 +1,3 @@
-from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from pytoniq_core import Address
 from app.utils.auth_utils import get_connector
 
