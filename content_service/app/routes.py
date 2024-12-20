@@ -45,9 +45,14 @@ async def get_nft_collection(collection_address: str):
 @router.get(
     "/nfts/collections/{collection_address}/items", response_model=NFTItemsSchema
 )
-async def get_collection_items(collection_address: str):
+async def get_collection_items(
+    collection_address: str,
+    limit: int = Query(20, ge=1, le=100, description="Number of items to return per page"),
+    offset: int = Query(0, ge=0, description="Offset for pagination"),
+):
+
     try:
-        items = await NFTService.get_items(collection_address)
+        items = await NFTService.get_items(collection_address, limit=limit, offset=offset)
         if items is None:
             raise HTTPException(status_code=404, detail="Not found")
         return items

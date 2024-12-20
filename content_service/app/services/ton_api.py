@@ -60,10 +60,11 @@ class TonApiService:
 
         return item_data
 
-    async def fetch_items_by_collection(self, collection_address: str) -> list[dict]:
-
+    async def fetch_items_by_collection(self, collection_address: str, limit: int = 20, offset: int = 0) -> list[dict]:
         res = await self.tonapi.nft.get_items_by_collection_address(
-            account_id=collection_address
+            account_id=collection_address,
+            limit=limit,
+            offset=offset,
         )
 
         nft_items = []
@@ -106,6 +107,7 @@ class TonApiService:
             nft_items.append(item_data)
 
         return nft_items
+
     
     async def fetch_account_data(self, account_address: str) -> dict:
         res = await self.tonapi.accounts.get_info(
