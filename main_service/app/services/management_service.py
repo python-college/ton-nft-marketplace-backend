@@ -1,6 +1,6 @@
 from base64 import urlsafe_b64encode
 from datetime import datetime
-from tonsdk.utils import Address
+from pytoniq_core import Address
 from tonutils.nft import (
     CollectionStandardModified,
     CollectionEditableModified,
@@ -25,7 +25,7 @@ from app.settings import (
 )
 
 
-class ManagementModel:
+class ManagementService:
 
     @staticmethod
     async def mint_collection(collection_data: MintCollectionSchema):

@@ -31,7 +31,7 @@ class NFTService:
         return item_data_schema
     
     @staticmethod
-    async def get_items(collection_address: str) -> NFTItemsSchema | None:
+    async def get_items(collection_address: str, limit: int = 20, offset: int = 0) -> NFTItemsSchema | None:
         ton_service = TonApiService()
         try:
             raw_collection_address = Address(collection_address).to_string(
@@ -41,7 +41,11 @@ class NFTService:
             raise ValueError() from exc
 
         try:
-            items_data = await ton_service.fetch_items_by_collection(raw_collection_address)
+            items_data = await ton_service.fetch_items_by_collection(
+                raw_collection_address,
+                limit=limit,
+                offset=offset,
+            )
         except TONAPINotFoundError:
             return None
 
@@ -51,7 +55,6 @@ class NFTService:
             hype = rarebay_item_data.hype + 1 if rarebay_item_data is not None else 0
             item["hype"] = hype
 
-
         items_schema = NFTItemsSchema(
             nft_items=[NFTItemSchema(**item) for item in items_data],
         )
@@ -59,6 +62,7 @@ class NFTService:
             await NFTRepository.update_nft(item)
 
         return items_schema
+
     
     @staticmethod
     async def get_most_hype_items(page: int = 1, page_size: int = 20) -> TopNFTItemsSchema:
