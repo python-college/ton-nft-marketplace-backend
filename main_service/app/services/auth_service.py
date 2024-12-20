@@ -1,18 +1,28 @@
+from urllib.parse import urlparse, parse_qs, urlencode, urlunparse
 from pytoniq_core import Address
 from app.utils.auth_utils import get_connector
 
 
-class AuthModel:
+class AuthService:
     def __init__(self, session_id: str):
         self.session_id = session_id
         self.connector = get_connector(session_id)
 
     async def connect_wallet(self) -> str:
         wallets_list = self.connector.get_wallets()
+            
         wallet = wallets_list[1]
         generated_url = await self.connector.connect(wallet)
-        return generated_url
 
+        generated_url = "tc://" + generated_url[len("https://app.tonkeeper.com/ton-connect"):]  
+
+        if "r=" in generated_url:
+            base, param = generated_url.split("r=", 1)
+            param = param.replace("+", "%20")
+            generated_url = base + "r=" + param
+
+        return generated_url
+    
     async def handle_auth(self):
 
         await self.connector.restore_connection()

@@ -25,7 +25,7 @@ from app.settings import (
 )
 
 
-class ManagementModel:
+class ManagementService:
 
     @staticmethod
     async def mint_collection(collection_data: MintCollectionSchema):

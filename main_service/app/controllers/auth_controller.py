@@ -1,7 +1,7 @@
 from fastapi import WebSocket, HTTPException
 from pytoniq_core import Address
 from app.utils.auth_utils import generate_session_id
-from app.models.auth_model import AuthModel
+from app.services.auth_service import AuthService
 from app.schemas.auth import (
     AuthLinkSchema,
     AuthLinkPayload,
@@ -18,7 +18,7 @@ class AuthController:
         await websocket.accept()
 
         session_id = generate_session_id()
-        auth = AuthModel(session_id)
+        auth = AuthService(session_id)
 
         auth_link = await auth.connect_wallet()
         await websocket.send_json(
@@ -40,7 +40,7 @@ class AuthController:
 
     @staticmethod
     async def check_auth(session_id: str):
-        address = await AuthModel.check_auth(session_id)
+        address = await AuthService.check_auth(session_id)
         if address is not None:
             return AuthSuccessSchema(payload=AuthSuccessPayload(address=Address(address).to_str(
                 is_bounceable=True, is_user_friendly=True
