@@ -9,8 +9,8 @@ services:
       - "443:443"
     volumes:
       - ./nginx/nginx.conf:/etc/nginx/nginx.conf:ro
-      - ./ssl/localhost.pem/:/etc/nginx/ssl/subdomain.rarebay.ru
-      - ./ssl/localhost.key/:/etc/nginx/ssl/subdomain.rarebay.key
+      - ./ssl/subdomain.rarebay.pem/:/etc/nginx/ssl/subdomain.rarebay.ru
+      - ./ssl/subdomain.rarebay.key/:/etc/nginx/ssl/subdomain.rarebay.key
     depends_on:
       - main_service
       - content_service
